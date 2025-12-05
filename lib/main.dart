@@ -365,58 +365,44 @@ class _OtpLiveWidgetState extends State<OtpLiveWidget> {
               ),
             )
           : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Logo and title also in loading state for consistency
-                  Column(
-                    children: [
-                      Image.asset(
-                        'assets/images/logo.png', // Replace with your logo asset path
-                        height: 40,
-                        width: 40,
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'OTP',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  Container(
-                    padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 80,
+                      width: 80,
                     ),
-                    child: const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFF2196F3),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'OTP Internal App',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'System Loading...',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey,
+                    const SizedBox(height: 12),
+                    const Text(
+                      'This application only works when it is opened from the main app via a deep link.\n\n'
+                      'Please use the test deep link to perform the verification.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
-                  ),
-                ],
+                    // const SizedBox(height: 30),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     _handleUri(
+                    //       Uri.parse(
+                    //         'myotp://verify?uuid=123e4567-e89b-12d3-a456-426614174000',
+                    //       ),
+                    //     );
+                    //   },
+                    //   child: const Text('Test OTP for Apple'),
+                    // ),
+                  ],
+                ),
               ),
             ),
     );
