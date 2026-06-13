@@ -3,6 +3,8 @@
         <package android:name="com.example.mobile" /> <!-- app chính -->
     </queries>
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:label="otp"
         android:name="${applicationName}"
