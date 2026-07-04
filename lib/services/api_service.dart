@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 class ApiService {
   static Future<String?> fetchUserFullName(String uuid) async {
     final url = Uri.parse(
-      'http://192.168.110.2/web_develop/iam/cip3/?c=UserController&m=getUserByUUID&uuid=$uuid',
+      'http://192.168.110.7/iam/cip3/?c=UserController&m=getUserByUUID&uuid=$uuid',
     );
 
     try {

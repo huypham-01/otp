@@ -7,6 +7,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../services/otp_service.dart';
 import '../services/api_service.dart';
+import '../services/app_update_service.dart';
 import 'scanner_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,6 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _initDeepLink();
+    // Check for app update — runs after first frame so Navigator is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        AppUpdateService.check(context);
+      }
+    });
   }
 
   Future<void> _initDeepLink() async {
@@ -293,6 +300,23 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> _logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('saved_uuid');
+    } catch (e) {
+      debugPrint('Logout error: $e');
+    }
+    
+    setState(() {
+      _uuid = null;
+      _fullname = null;
+      _status = 'Logged out';
+    });
+    
+    _timer?.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -316,6 +340,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () => _showAccountInfo(context),
                   ),
                 ),
+                // Padding(
+                //   padding: const EdgeInsets.only(right: 8.0),
+                //   child: IconButton(
+                //     icon: Container(
+                //       padding: const EdgeInsets.all(6),
+                //       decoration: BoxDecoration(
+                //         color: Colors.redAccent.withOpacity(0.1),
+                //         shape: BoxShape.circle,
+                //       ),
+                //       child: const Icon(Icons.logout, color: Colors.redAccent),
+                //     ),
+                //     onPressed: () {
+                //       showDialog(
+                //         context: context,
+                //         builder: (context) => AlertDialog(
+                //           title: const Text('Đăng xuất'),
+                //           content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+                //           actions: [
+                //             TextButton(
+                //               onPressed: () => Navigator.pop(context),
+                //               child: const Text('Hủy'),
+                //             ),
+                //             TextButton(
+                //               onPressed: () {
+                //                 Navigator.pop(context);
+                //                 _logout();
+                //               },
+                //               child: const Text(
+                //                 'Đăng xuất',
+                //                 style: TextStyle(color: Colors.redAccent),
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
               ],
             )
           : null,
