@@ -46,7 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final prefs = await SharedPreferences.getInstance();
       final savedUuid = prefs.getString('saved_uuid');
       if (savedUuid != null && savedUuid.isNotEmpty) {
-        _setUuidAndStartTimer(savedUuid, 'Loaded UUID from storage: $savedUuid');
+        _setUuidAndStartTimer(
+          savedUuid,
+          'Loaded UUID from storage: $savedUuid',
+        );
       }
 
       print('🔄 Initializing deep link listener...');
@@ -123,9 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final prefs = await SharedPreferences.getInstance();
       final savedUuid = prefs.getString('saved_uuid');
       if (savedUuid == null || savedUuid.isEmpty) {
-        setState(
-          () => _status = 'No UUID to generate OTP (run verify first?)',
-        );
+        setState(() => _status = 'No UUID to generate OTP (run verify first?)');
         return;
       }
 
@@ -193,6 +194,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAccountInfo(BuildContext context) {
+    final displayName = (_fullname == null || _fullname!.trim().isEmpty)
+        ? 'Test Username'
+        : _fullname!;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -226,66 +231,58 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              if (_fullname != null) ...[
-                CircleAvatar(
-                  radius: 36,
-                  backgroundColor: Colors.blueAccent.withOpacity(0.1),
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.blueAccent,
-                  ),
+
+              CircleAvatar(
+                radius: 36,
+                backgroundColor: Colors.blueAccent.withOpacity(0.1),
+                child: const Icon(
+                  Icons.person,
+                  size: 40,
+                  color: Colors.blueAccent,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  _fullname!,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 16),
+
+              Text(
+                displayName,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: QrImageView(
+                  data: displayName,
+                  version: QrVersions.auto,
+                  size: 180,
+                  eyeStyle: const QrEyeStyle(
+                    eyeShape: QrEyeShape.square,
+                    color: Color(0xFF0F172A),
+                  ),
+                  dataModuleStyle: const QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.square,
                     color: Color(0xFF0F172A),
                   ),
                 ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: QrImageView(
-                    data: _fullname!,
-                    version: QrVersions.auto,
-                    size: 180.0,
-                    eyeStyle: const QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
-                      color: Color(0xFF0F172A),
-                    ),
-                    dataModuleStyle: const QrDataModuleStyle(
-                      dataModuleShape: QrDataModuleShape.square,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                ),
+              ),
 
-                const SizedBox(height: 24),
-              ] else ...[
-                const Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: CircularProgressIndicator(),
-                ),
-                const Text(
-                  'Fetching information...',
-                  style: TextStyle(color: Color(0xFF64748B)),
-                ),
-                const SizedBox(height: 24),
-              ],
+              const SizedBox(height: 24),
             ],
           ),
         );
@@ -307,13 +304,13 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       debugPrint('Logout error: $e');
     }
-    
+
     setState(() {
       _uuid = null;
       _fullname = null;
       _status = 'Logged out';
     });
-    
+
     _timer?.cancel();
   }
 
@@ -356,7 +353,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 //         context: context,
                 //         builder: (context) => AlertDialog(
                 //           title: const Text('Đăng xuất'),
-                //           content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+                //           content: const Text(
+                //             'Bạn có chắc chắn muốn đăng xuất?',
+                //           ),
                 //           actions: [
                 //             TextButton(
                 //               onPressed: () => Navigator.pop(context),
