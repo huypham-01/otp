@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:app_links/app_links.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -97,58 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _handleUri(Uri uri) async {
     print('🔗 Full URI processing: $uri');
-
-    if (uri.host == 'verify') {
-      final uuid = uri.queryParameters['uuid'];
-      Future.delayed(const Duration(seconds: 5), () async {
-        try {
-          await launchUrl(
-            Uri.parse('myapp://change_password'),
-            mode: LaunchMode.externalNonBrowserApplication,
-          );
-        } catch (e) {
-          print('❌ Intent send error: $e');
-        }
-      });
-
-      if (uuid != null && uuid.isNotEmpty) {
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('saved_uuid', uuid);
-        } catch (e) {
-          print('❌ SharedPreferences save error: $e');
-        }
-        _setUuidAndStartTimer(uuid, 'Processed successfully!');
-      } else {
-        setState(() => _status = 'UUID missing or empty');
-      }
-    } else if (uri.host == 'generate') {
-      final prefs = await SharedPreferences.getInstance();
-      final savedUuid = prefs.getString('saved_uuid');
-      if (savedUuid == null || savedUuid.isEmpty) {
-        setState(() => _status = 'No UUID to generate OTP (run verify first?)');
-        return;
-      }
-
-      setState(() {
-        _status = 'OTP generated: $otpCurr';
-        _uuid = savedUuid;
-      });
-
-      await Future.delayed(const Duration(seconds: 2));
-      final backUri = Uri.parse('myapp://login?otp=$otpCurr');
-      try {
-        await launchUrl(
-          backUri,
-          mode: LaunchMode.externalNonBrowserApplication,
-        );
-      } catch (e) {
-        print('❌ Send back error: $e');
-        setState(() => _status += ' (OTP send failed: $e)');
-      }
-    } else {
-      setState(() => _status = 'Invalid host: ${uri.host}');
-    }
+    // Chỉ nhận deeplink để mở app, không tự động chuyển hướng hay lưu UUID từ link nữa.
   }
 
   void _startOtpTimer() {
@@ -337,46 +287,46 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () => _showAccountInfo(context),
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.only(right: 8.0),
-                //   child: IconButton(
-                //     icon: Container(
-                //       padding: const EdgeInsets.all(6),
-                //       decoration: BoxDecoration(
-                //         color: Colors.redAccent.withOpacity(0.1),
-                //         shape: BoxShape.circle,
-                //       ),
-                //       child: const Icon(Icons.logout, color: Colors.redAccent),
-                //     ),
-                //     onPressed: () {
-                //       showDialog(
-                //         context: context,
-                //         builder: (context) => AlertDialog(
-                //           title: const Text('Đăng xuất'),
-                //           content: const Text(
-                //             'Bạn có chắc chắn muốn đăng xuất?',
-                //           ),
-                //           actions: [
-                //             TextButton(
-                //               onPressed: () => Navigator.pop(context),
-                //               child: const Text('Hủy'),
-                //             ),
-                //             TextButton(
-                //               onPressed: () {
-                //                 Navigator.pop(context);
-                //                 _logout();
-                //               },
-                //               child: const Text(
-                //                 'Đăng xuất',
-                //                 style: TextStyle(color: Colors.redAccent),
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       );
-                //     },
-                //   ),
-                // ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.logout, color: Colors.redAccent),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Đăng xuất'),
+                          content: const Text(
+                            'Bạn có chắc chắn muốn đăng xuất?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Hủy'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _logout();
+                              },
+                              child: const Text(
+                                'Đăng xuất',
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             )
           : null,
@@ -627,6 +577,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
+                    if (otpCurr != null) ...[
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: otpCurr!));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Copied to clipboard')),
+                          );
+                        },
+                        icon: const Icon(Icons.copy),
+                        label: const Text('Copy'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF1F5F9),
+                          foregroundColor: const Color(0xFF0F172A),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
