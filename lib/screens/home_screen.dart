@@ -583,7 +583,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: otpCurr!));
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Copied to clipboard')),
+                            const SnackBar(
+                              content: Text('Copied to clipboard'),
+                            ),
                           );
                         },
                         icon: const Icon(Icons.copy),
